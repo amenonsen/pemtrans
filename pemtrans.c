@@ -2,7 +2,7 @@
  * <http://www.oryx.com/ams/pemtrans.html>
  *
  * Converts an OpenSSL PEM private key and signed certificate into a
- * cryptlib PKCS#15 file keyset.
+ * cryptlib PKCS #15 key file.
  *
  * Copyright 2004 Abhijit Menon-Sen <ams@oryx.com>
  * Use, modification, and distribution of pemtrans is allowed without
@@ -22,11 +22,38 @@
 #include <stdio.h>
 
 
-void check( int n, char *s )
+void check( int n, CRYPT_HANDLE c, char *s )
 {
+    int status;
+    int locus = 0;
+    int type = 0;
+    int length = 0;
+
     if ( n == CRYPT_OK )
         return;
-    fprintf( stderr, "%s failed with code %d\n", s, n );
+
+    cryptGetAttribute( c, CRYPT_ATTRIBUTE_ERRORLOCUS, &locus );
+    cryptGetAttribute( c, CRYPT_ATTRIBUTE_ERRORTYPE, &type );
+
+    fprintf( stderr, "%s failed.\n", s );
+    fprintf( stderr, "\tError code: %d\n", n );
+    if ( locus != 0 )
+        fprintf( stderr, "\tError locus: %d\n", locus );
+    if ( type != 0 )
+        fprintf( stderr, "\tError type: %d\n", type );
+
+    status = cryptGetAttributeString( c, CRYPT_ATTRIBUTE_INT_ERRORMESSAGE,
+                                      0, &length );
+    if ( cryptStatusOK( status ) ) {
+        char * err = malloc( length );
+        if ( !err )
+            exit( -1 );
+        status = cryptGetAttributeString( c, CRYPT_ATTRIBUTE_INT_ERRORMESSAGE,
+                                          err, &length );
+        if ( cryptStatusOK( status ) )
+            fprintf( stderr, "\tError message: %s\n", err );
+    }
+
     exit( -1 );
 }
 
@@ -142,18 +169,18 @@ int main( int argc, char *argv[] )
     }
 
     n = cryptCreateContext( &pKey, CRYPT_UNUSED, CRYPT_ALGO_RSA );
-    check( n, "cryptCreateContext" );
+    check( n, pKey, "cryptCreateContext" );
 
     n = cryptSetAttributeString( pKey, CRYPT_CTXINFO_LABEL,
                                  label, strlen( label ) );
-    check( n, "cryptSetAttributeString(LABEL)" );
+    check( n, pKey, "cryptSetAttributeString(LABEL)" );
 
     n = cryptSetAttributeString( pKey, CRYPT_CTXINFO_KEY_COMPONENTS,
                                  &rsa, sizeof( CRYPT_PKCINFO_RSA ) );
-    check( n, "cryptSetAttributeString(KEY_COMPONENTS)" );
+    check( n, pKey, "cryptSetAttributeString(KEY_COMPONENTS)" );
 
     n = cryptImportCert( certData, st.st_size, CRYPT_UNUSED, &cert );
-    check( n, "cryptImportCert" );
+    check( n, cert, "cryptImportCert" );
 
     n = cryptGetAttribute( cert, CRYPT_CERTINFO_KEYUSAGE, &usage );
     if ( n != CRYPT_OK ) {
@@ -164,12 +191,12 @@ int main( int argc, char *argv[] )
 
     n = cryptKeysetOpen( &keyset, CRYPT_UNUSED, CRYPT_KEYSET_FILE,
                          outFile, opt );
-    check( n, "cryptKeysetOpen" );
+    check( n, keyset, "cryptKeysetOpen" );
 
     n = cryptAddPrivateKey( keyset, pKey, secret );
-    check( n, "cryptAddPrivateKey" );
+    check( n, keyset, "cryptAddPrivateKey" );
     n = cryptAddPublicKey( keyset, cert );
-    check( n, "cryptAddPublicKey" );
+    check( n, keyset, "cryptAddPublicKey" );
 
     cryptKeysetClose( keyset );
     cryptDestroyComponents( &rsa );
