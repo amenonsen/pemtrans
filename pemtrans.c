@@ -1,10 +1,10 @@
 /*
- * <http://www.oryx.com/ams/pemtrans.html>
+ * <http://toroid.org/ams/pemtrans>
  *
  * Converts an OpenSSL PEM private key and signed certificate into a
  * cryptlib PKCS #15 key file.
  *
- * Copyright 2004 Abhijit Menon-Sen <ams@oryx.com>
+ * Copyright 2004 Abhijit Menon-Sen <ams@toroid.org>
  * Use, modification, and distribution of pemtrans is allowed without
  * any limitations. There is no warranty, express or implied.
  */
@@ -186,7 +186,7 @@ int main( int argc, char *argv[] )
     if ( n != CRYPT_OK ) {
         fprintf( stderr, "Warning: The certificate specifies no KEYUSAGE.\n"
                          "Cryptlib may not permit its use. See "
-                         "<http://www.oryx.com/ams/pemtrans.html>.\n" );
+                         "<http://toroid.org/ams/pemtrans>.\n" );
     }
 
     n = cryptKeysetOpen( &keyset, CRYPT_UNUSED, CRYPT_KEYSET_FILE,
