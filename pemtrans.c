@@ -43,6 +43,7 @@ int main( int argc, char *argv[] )
     char *label;
     char *secret;
     struct stat st;
+    int usage;
 
     RSA *key;
     EVP_PKEY *evp;
@@ -152,7 +153,14 @@ int main( int argc, char *argv[] )
     check( n, "cryptSetAttributeString(KEY_COMPONENTS)" );
 
     n = cryptImportCert( certData, st.st_size, CRYPT_UNUSED, &cert );
-    check( n, "CryptImportCert" );
+    check( n, "cryptImportCert" );
+
+    n = cryptGetAttribute( cert, CRYPT_CERTINFO_KEYUSAGE, &usage );
+    if ( n != CRYPT_OK ) {
+        fprintf( stderr, "Warning: The certificate specifies no KEYUSAGE.\n"
+                         "Cryptlib may not permit its use. See "
+                         "<http://www.oryx.com/ams/pemtrans.html>.\n" );
+    }
 
     n = cryptKeysetOpen( &keyset, CRYPT_UNUSED, CRYPT_KEYSET_FILE,
                          outFile, opt );

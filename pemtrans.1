@@ -52,6 +52,21 @@ To generate the
 keyset from the key created above:
 .IP
 pemtrans host.key host.crt host.p15 hostname s3kret-p4ssword
+.SH KEY USAGE
+Cryptlib requires (and respects) the KEYUSAGE attribute on certificates.
+Some certificates do not contain this attribute, and pemtrans issues a
+warning when it encounters them, because Cryptlib will probably reject
+it when you try to use it for something, e.g. in a TLS server.
+.PP
+OpenSSL, by default, does not set KEYUSAGE. This can be fixed by adding
+a line like
+.IP
+keyUsage = cRLSign, digitalSignature, keyEncipherment, keyCertSign
+.PP
+to
+.I openssl.cnf
+before generating the key and certificate (the attributes specified here
+are enough for the result to be used in a TLS server).
 .SH DIAGNOSTICS
 .B pemtrans
 returns 0 in case of success and 1 in case of error.
