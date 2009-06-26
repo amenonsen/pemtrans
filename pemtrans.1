@@ -1,0 +1,75 @@
+.TH pemtrans 1 2005-01-27 www.oryx.com/ams/ "Abhijit Menon-Sen"
+.SH NAME
+pemtrans - convert OpenSSL RSA keys into Cryptlib keysets
+.SH SYNOPSIS
+.B pemtrans file.key file.crt outfile label secret
+.SH DESCRIPTION
+.nh
+.PP
+.B pemtrans
+converts an OpenSSL RSA private key and the corresponding signed
+certificate into a PKCS#15 keyset for use with Cryptlib.
+.PP
+Cryptlib stores private keys and the associated public key certificates
+in password-protected PKCS#15 keysets. OpenSSL uses a separate pair of
+files to store each private key and certificate. Although Cryptlib can
+import OpenSSL certificates directly, it does not support the PEM key
+storage format, which is undocumented and relies only on the file
+permissions to protect the private key.
+.PP
+This program reads an RSA private key (typically stored in a
+.IR .key
+file) and the corresponding certificate (from a
+.IR .crt
+file), and writes it to a
+PKCS#15 keyset.
+.SH OPTIONS
+.IP file.key
+is the PEM-format file in which the private key is stored. It is a
+base64-encoded file starting with "---BEGIN RSA PRIVATE KEY---" or
+similar.
+.IP file.crt
+is the PEM-format file in which the certificate is stored. It is a
+base64-encoded file starting with "---BEGIN CERTIFICATE---" or similar.
+.IP outfile
+is the keyset file to be written. If the file exists, the new key and
+certificate will be appended to the file.
+.IP label
+is the label used to find this specific key in the keyset. The program
+that will use the keyset must be configured to use the same label.
+.IP secret
+is the passphrase used to protect the
+.I outfile
+keyset. The program that will use the keyset must be configured to use
+the same passphrase.
+.SH EXAMPLE
+To generate an OpenSSL private key and self-signed certificate:
+.IP
+openssl req -x509 -days 365 -newkey rsa: -nodes -keyout host.key -out host.crt
+.PP
+To generate the
+.IR host.p15
+keyset from the key created above:
+.IP
+pemtrans host.key host.crt host.p15 hostname s3kret-p4ssword
+.SH DIAGNOSTICS
+.B pemtrans
+returns 0 in case of success and 1 in case of error.
+.SH BUGS
+None known.
+.SH LICENSE
+Use, modification, and distribution of pemtrans is allowed without any
+limitations. There is no warranty, express or implied.
+.SH INSTALLATION
+Just edit the included Makefile, build, and copy the binary and man page
+somewhere convenient.
+.SH AUTHOR
+Abhijit Menon-Sen <ams@oryx.com>
+.SH SEE ALSO
+.BR openssl (1)
+.br
+.B http://www.openssl.org 
+.br
+.B http://www.cryptlib.com
+.br
+.B http://www.oryx.com/ams/pemtrans.html
