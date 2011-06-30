@@ -1,0 +1,8 @@
+pemtrans
+
+Converts an OpenSSl RSA key from the non-standard .pem format to a PKCS
+#15 keyset that can be used with cryptlib.
+
+--
+Abhijit Menon-Sen <ams@toroid.org>
+http://toroid.org/ams/pemtrans
