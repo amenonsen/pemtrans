@@ -42,13 +42,13 @@ void check( int n, CRYPT_HANDLE c, char *s )
     if ( type != 0 )
         fprintf( stderr, "\tError type: %d\n", type );
 
-    status = cryptGetAttributeString( c, CRYPT_ATTRIBUTE_INT_ERRORMESSAGE,
+    status = cryptGetAttributeString( c, CRYPT_ATTRIBUTE_ERRORMESSAGE,
                                       0, &length );
     if ( cryptStatusOK( status ) ) {
         char * err = malloc( length );
         if ( !err )
             exit( -1 );
-        status = cryptGetAttributeString( c, CRYPT_ATTRIBUTE_INT_ERRORMESSAGE,
+        status = cryptGetAttributeString( c, CRYPT_ATTRIBUTE_ERRORMESSAGE,
                                           err, &length );
         if ( cryptStatusOK( status ) )
             fprintf( stderr, "\tError message: %s\n", err );

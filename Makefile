@@ -5,14 +5,15 @@
 #LIBS = -L/usr/local/openssl/lib
 
 ## Where is libcl.a?
-CRYPTLIB = /usr/local/lib/libcl.a
+#CRYPTLIB = /usr/local/lib/libcl.a
 
 ## Cryptlib is usually linked with these libraries:
 EXTRA_LIBS = -lresolv -lpthread
 
+## Remember to change theese to suit your environment!!
 INCLUDES = -I/home/ams/build/cryptlib
 CRYPTLIB = /home/ams/build/cryptlib/libcl.a
 
 pemtrans: pemtrans.c
 	cc $(INCLUDES) $(LIBS) -o pemtrans pemtrans.c $(CRYPTLIB) \
-	-lssl $(EXTRA_LIBS)
+	-lcrypto -lssl $(EXTRA_LIBS)
